@@ -40,7 +40,7 @@ gameServer.define("state_handler", StateHandlerRoom);
 // Register StateHandlerRoom as "state_handler"
 gameServer.define("auth", AuthRoom);
 
-//gameServer.define("energy", EnergyRoom);
+gameServer.define("energy", EnergyRoom);
 //app.use('/dash', dash);
 
 app.use('/', express.static(path.join(__dirname, "static")));
