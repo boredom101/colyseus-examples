@@ -1,9 +1,9 @@
 import { Room } from "colyseus";
 
+clients = {};
+
 export class EnergyRoom extends Room {
     maxClients = 3;
-    
-    clients = {};
     
     onCreate (options) {
         console.log("energy room created!", options);
@@ -25,4 +25,8 @@ export class EnergyRoom extends Room {
         console.log("dispose energy room");
     }
 
+}
+
+export function dash(req, res, next) {
+    res.send(clients);
 }
