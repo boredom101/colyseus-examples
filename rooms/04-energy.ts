@@ -10,15 +10,15 @@ export class EnergyRoom extends Room {
     }
 
     onJoin (client) {
-        clients[client.id] = {};
+        this.clients[client.id] = {};
     }
 
     onLeave (client) {
-        clients[client.id] = {};
+        this.clients[client.id] = {};
     }
 
     onMessage (client, data) {
-        clients[client.id] = Object.assign(clients[client.id], data);
+        this.clients[client.id] = Object.assign(clients[client.id], data);
     }
 
     onDispose () {
