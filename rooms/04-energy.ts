@@ -1,33 +1,29 @@
 import { Room } from "colyseus";
 
-interface Dictionary<T> {
-    [key: number]: T;
-}
-
 interface IClient {
-    name: string;
-    energy: number;
+    name?: string;
+    energy?: number;
 }
 
 export class EnergyRoom extends Room {
     maxClients = 3;
     
-    clients: { [id: string] : IClient; } = {};
+    players: { [id: string] : IClient; } = {};
     
     onCreate (options) {
         console.log("energy room created!", options);
     }
 
     onJoin (client) {
-        this.clients[client.id] = {};
+        this.players[client.id] = {};
     }
 
     onLeave (client) {
-        this.clients[client.id] = {};
+        this.players[client.id] = {};
     }
 
     onMessage (client, data) {
-        this.clients[client.id] = Object.assign(clients[client.id], data);
+        this.players[client.id] = data;
     }
 
     onDispose () {
