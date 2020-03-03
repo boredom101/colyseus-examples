@@ -3,7 +3,7 @@ import { Room } from "colyseus";
 export class EnergyRoom extends Room {
     maxClients = 3;
     
-    clients = {};
+    clients: { [id: string]: { name: string; energy: number; } } = {};
     
     onCreate (options) {
         console.log("energy room created!", options);
