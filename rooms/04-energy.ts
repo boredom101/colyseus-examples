@@ -1,9 +1,18 @@
 import { Room } from "colyseus";
 
+interface Dictionary<T> {
+    [key: number]: T;
+}
+
+interface IClient {
+    name: string;
+    energy: number;
+}
+
 export class EnergyRoom extends Room {
     maxClients = 3;
     
-    clients: { [id: string]: { name: string; energy: number; } } = {};
+    clients: { [id: string] : IClient; } = {};
     
     onCreate (options) {
         console.log("energy room created!", options);
