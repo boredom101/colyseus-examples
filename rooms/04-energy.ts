@@ -27,6 +27,8 @@ export class EnergyRoom extends Room {
 
 }
 
+/*
 export function dash(req, res, next) {
     res.send(clients);
 }
+*/
