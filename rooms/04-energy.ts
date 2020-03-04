@@ -5,33 +5,33 @@ interface IClient {
     energy?: number;
 }
 
+players: { [id: string] : IClient; } = {};
+
 export class EnergyRoom extends Room {
     maxClients = 3;
-    
-    players: { [id: string] : IClient; } = {};
     
     onCreate (options) {
         console.log("energy room created!", options);
     }
 
     onJoin (client) {
-        this.players[client.id] = {};
+        players[client.id] = {};
     }
 
     onLeave (client) {
-        this.players[client.id] = {};
+        players[client.id] = {};
     }
 
     onMessage (client, data) {
-        this.players[client.id] = data;
+        players[client.id] = data;
     }
 
     onDispose () {
         console.log("dispose energy room");
     }
-    
-    dash (req, res, next) {
-        res.send(players);
-    }
 
 }
+
+export function dash (req, res, next) {
+        res.send(players);
+    }
