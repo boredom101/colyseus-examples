@@ -41,7 +41,7 @@ gameServer.define("state_handler", StateHandlerRoom);
 gameServer.define("auth", AuthRoom);
 
 gameServer.define("energy", EnergyRoom);
-app.use('/dash', dash);
+app.use('/dash', dash());
 
 app.use('/', express.static(path.join(__dirname, "static")));
 app.use('/', serveIndex(path.join(__dirname, "static"), {'icons': true}))
