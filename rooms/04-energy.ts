@@ -29,11 +29,9 @@ export class EnergyRoom extends Room {
     onDispose () {
         console.log("dispose energy room");
     }
+    
+    dash (req, res, next) {
+        res.send(players);
+    }
 
 }
-
-/*
-export function dash(req, res, next) {
-    res.send(clients);
-}
-*/
