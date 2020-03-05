@@ -5,10 +5,13 @@ interface IClient {
     energy?: number;
 }
 
-players: { [id: string] : IClient; } = {};
+function RoomFactory (players) {
+    return EnergyRoom.
+}
 
 export class EnergyRoom extends Room {
     maxClients = 3;
+    players?: { [id: string]: IClient; };
     
     onCreate (options) {
         console.log("energy room created!", options);
@@ -32,6 +35,13 @@ export class EnergyRoom extends Room {
 
 }
 
-export function dash (req, res, next) {
+export function dash(players) {
+    return function inner(req, res, next) {
         res.send(players);
-    }
+}
+}
+
+export function energy() {
+    var players: { [id: string]: IClient; } = {};
+    return {RoomFactory(players), dash(players)};
+}
