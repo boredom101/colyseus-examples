@@ -5,28 +5,29 @@ interface IClient {
     energy?: number;
 }
 
-function RoomFactory (players) {
-    return EnergyRoom.
-}
-
 export class EnergyRoom extends Room {
     maxClients = 3;
     players?: { [id: string]: IClient; };
+
+    constructor(players) {
+        super(...arguments);
+        this.players = players;
+    }
     
     onCreate (options) {
         console.log("energy room created!", options);
     }
 
     onJoin (client) {
-        players[client.id] = {};
+        this.players[client.id] = {};
     }
 
     onLeave (client) {
-        players[client.id] = {};
+        this.players[client.id] = {};
     }
 
     onMessage (client, data) {
-        players[client.id] = data;
+        this.players[client.id] = data;
     }
 
     onDispose () {
@@ -42,6 +43,6 @@ export function dash(players) {
 }
 
 export function energy() {
-    var players: { [id: string]: IClient; } = {};
-    return {RoomFactory(players), dash(players)};
+    var clients: { [id: string]: IClient; } = {};
+    return [ dash(clients), EnergyRoom.bind(clients) ];
 }
