@@ -18,5 +18,407 @@
         padding: 3px;
       }
     </style>
+    <script type="text/javascript" src="https://raw.githack.com/colyseus/colyseus.js/master/dist/colyseus.js"></script>
   </head>
+  <body>
+    <div id="images">
+  <img id="nuclear-img" width="40" height="40" src="https://i.ibb.co/yp3vnDT/Nuclear-Power-Plant-1.png" alt="Nuclear Plant">
+  <img id="dam-img" width="40" height="40" src="https://i.ibb.co/sCR4Kdc/Dam.png" alt="Hydroelectric Dam">
+  <img id="solar-img" width="40" height="40" src="https://i.ibb.co/yqNnkrJ/Solar.png" alt="Solar Farm">
+  <img id="wind-img" width="40" height="40" src="https://i.ibb.co/By1Wgny/Wind.png" alt="Wind Farm">
+  <img id="coal-img" width="40" height="40" src="https://i.ibb.co/02dZs2C/Coal.png" alt="Coal Plant">
+  <img id="school-img" width="40" height="40" src="https://i.ibb.co/4SsrV6W/New-Piskel.png" alt="School">
+  <img id="factory1-img" width="40" height="40" src="https://i.ibb.co/Hx2GQv3/Coal-clone.png" alt="Factory">
+  <img id="factory2-img" width="40" height="40" src="https://i.ibb.co/LJBrqL7/Coal-clone-clone.png" alt="Rare Metal Factory">
+</div>
+
+<select name="building" id="building">
+  <option value="nuclear">Nuclear Plant</option>
+  <option value="dam">Hydroelectric Dam</option>
+  <option value="solar">Solar Farm</option>
+  <option value="wind">Wind Farm</option>
+  <option value="coal">Coal Plant</option>
+  <option value="school">School</option>
+  <option value="factory1">Factory</option>
+  <option value="factory2">Rare Metal Factory</option>
+</select>
+<button id="build">Build</button>
+<button id="clean">Clean Pollution For $0</button>
+<span id="coord">(0, 0)</span>
+<span id="tile">Energy Production: 0</span>
+
+<div id="columns">
+  <div id="resources" class="stats">
+    <div id="money">Money: 1000</div>
+    <div id="material">Material: 1000</div>
+    <div id="rare-material">Rare Material: 500</div>
+    <div id="pollution">Pollution: 0</div>
+    <div id="energy">Energy: 0</div>
+    <div id="education">Education: 0</div>
+  </div>
+
+  <div id="rates" class="stats">
+    <div id="pollution-rate">Pollution Rate: 0</div>
+    <div id="material-rate">Material Rate: 0</div>
+    <div id="money-rate">Money Rate: 0</div>
+    <div id="rare-material-rate">Rare Material Rate: 0</div>
+  </div>
+
+<p id="info">
+Welcome to your new job as city planner of Electro-opolis, please do not destroy our town. Your goal is to power the entire city.
+</p>
+
+  <canvas id="canvas-demo" width="400" height="400"></canvas>
+</div>
+      <script>
+          var client = new Colyseus.Client('ws://energy-city.herokuapp.com:2567');
+var conn;
+var name = prompt("What is your name?");
+
+client.join("energy").then(room => {
+  conn = room;
+  conn.send({
+    name: name
+  });
+});
+
+while (!conn) {}
+
+var info = {
+  "denial": '“Not in my backyard!” - Concerned Citizen',
+  "pollute1": 'The city is getting polluted.',
+  "pollute2": '“This city is disgusting!”',
+  "pollute3": 'You’re Fired! The city is too polluted',
+  "negative": 'Money makes the world go round and you don’t have any!',
+  "nuclear": 'The epitome of modern science!',
+  "red": '“We are in the red”',
+  "win": 'You powered the entire city! You win!',
+  "edu1": '“Wait, so nuclear energy won’t kill us all!?”',
+  "edu2": '“Nuclear Power Plants: I guess they are different than the bomb and don’t always meltdown.”',
+  "edu3": '“Nuclear is so much more reliable and clean! Why didn’t we see it before?”',
+  "rare": 'Rare materials pollute more and require more maintenance. Maybe you should avoid them?',
+  "clean": 'You have cleaned pollution for the first time. Remember, the more pollution you have, the more expensive it is to clean.'
+};
+
+shown = [];
+
+function adj(x, y) {
+  ret = [];
+  if (x > 0) {
+    ret.push(tiles[x - 1][y].terrain);
+  }
+  if (y > 0) {
+    ret.push(tiles[x][y - 1].terrain);
+  }
+  if (x < 9) {
+    ret.push(tiles[x + 1][y].terrain);
+  }
+  if (y < 9) {
+    ret.push(tiles[x][y + 1].terrain);
+  }
+  return ret
+}
+
+function notify(slug) {
+  if (!shown.includes(slug)) {
+    document.getElementById("info").innerHTML = info[slug];
+    shown.push(slug);
+  }
+}
+
+function rewriteSub(id, display, value) {
+  document.getElementById(id).innerHTML = display + ": " + value;
+}
+
+function rewrite() {
+  rewriteSub("money", "Money", money);
+  rewriteSub("material", "Material", material);
+  rewriteSub("rare-material", "Rare Material", rareMaterial);
+  rewriteSub("pollution", "Pollution", pollution);
+  rewriteSub("energy", "Energy", energy);
+  rewriteSub("education", "Education", education);
+  rewriteSub("money-rate", "Money Rate", moneyRate);
+  rewriteSub("material-rate", "Material Rate", materialRate);
+  rewriteSub("rare-material-rate", "Rare Material Rate", rareMaterialRate);
+  rewriteSub("pollution-rate", "Pollution Rate", pollutionRate);
+}
+
+var coord = document.getElementById('coord');
+
+var canvas = document.getElementById('canvas-demo');
+var elemLeft = canvas.offsetLeft,
+  elemTop = canvas.offsetTop;
+
+var ids = ["nuclear", "dam", "solar", "wind", "coal", "school", "factory1", "factory2"];
+
+var buildings = {
+  "nuclear": {
+    "id": 0,
+    "materialCost": 1000,
+    "rareMaterialCost": 0,
+    "moneyCost": 1000,
+    "energyRate": 2500,
+    "pollutionRate": 1,
+    "moneyRate": -3,
+    "education": 0,
+    "allowedTiles": [0],
+    "calc": function(pos, around) {
+      return 0;
+    }
+  },
+  "dam": {
+    "id": 1,
+    "materialCost": 750,
+    "rareMaterialCost": 0,
+    "moneyCost": 750,
+    "energyRate": 500,
+    "pollutionRate": 3,
+    "moneyRate": -2,
+    "education": 0,
+    "allowedTiles": [2, 3],
+    "calc": function(pos, around) {
+      if (pos == 2 && around.includes(2) && around.includes(2, around.indexOf(2) + 1)) {
+        return 100;
+      } else if (pos == 3) {
+        return -50;
+      }
+      return 0;
+    }
+  },
+  "solar": {
+    "id": 2,
+    "materialCost": 500,
+    "rareMaterialCost": 250,
+    "moneyCost": 500,
+    "energyRate": 250,
+    "pollutionRate": 1,
+    "moneyRate": -1,
+    "education": 0,
+    "allowedTiles": [0, 1],
+    "calc": function(pos, around) {
+      if (pos == 1 && !around.includes(1)) {
+        return 50;
+      } else if (pos == 0 && around.includes(1)) {
+        return -50;
+      }
+    }
+  },
+  "wind": {
+    "id": 3,
+    "materialCost": 500,
+    "rareMaterialCost": 250,
+    "moneyCost": 500,
+    "energyRate": 250,
+    "pollutionRate": 1,
+    "moneyRate": -1,
+    "education": 0,
+    "allowedTiles": [0, 1],
+    "calc": function(pos, around) {
+      if (around.includes(3)) {
+        return 50;
+      } else if (pos == 0 && around.includes(1)) {
+        return -50;
+      } else if (pos == 1) {
+        return 50;
+      }
+    }
+  },
+  "coal": {
+    "id": 4,
+    "materialCost": 1000,
+    "rareMaterialCost": 0,
+    "moneyCost": 500,
+    "energyRate": 500,
+    "pollutionRate": 7,
+    "moneyRate": -5,
+    "education": 0,
+    "allowedTiles": [0],
+    "calc": function(pos, around) {
+      return 0;
+    }
+  },
+  "school": {
+    "id": 5,
+    "materialCost": 750,
+    "rareMaterialCost": 0,
+    "moneyCost": 500,
+    "energyRate": -250,
+    "pollutionRate": 0,
+    "moneyRate": -1,
+    "education": 1,
+    "allowedTiles": [0, 1],
+    "calc": function(pos, around) {
+      return 0;
+    }
+  },
+  "factory1": {
+    "id": 6,
+    "materialCost": 1000,
+    "rareMaterialCost": 0,
+    "moneyCost": 500,
+    "energyRate": -300,
+    "pollutionRate": 1,
+    "moneyRate": -1,
+    "education": 0,
+    "allowedTiles": [0],
+    "calc": function(pos, around) {
+      return 0;
+    }
+  },
+  "factory2": {
+    "id": 7,
+    "materialCost": 1000,
+    "rareMaterialCost": 0,
+    "moneyCost": 550,
+    "energyRate": -400,
+    "pollutionRate": 3,
+    "moneyRate": -2,
+    "education": 0,
+    "allowedTiles": [0],
+    "calc": function(pos, around) {
+      return 0;
+    }
+  }
+};
+
+var ctx = canvas.getContext("2d");
+
+var size = 40;
+
+var colors = ["#a2d689", "#2cd12c", "#0ed8e3", "#1c33e6"];
+
+var money = 1000,
+  material = 1000,
+  pollution = 0,
+  pollutionRate = 0,
+  energy = 0,
+  materialRate = 0,
+  moneyRate = 0,
+  education = 0,
+  rareMaterial = 500,
+  rareMaterialRate = 0,
+  count = 1;
+
+var x = 0,
+  y = 0;
+
+// terrain: plain, hill, river, sea
+
+function build() {
+  var building = document.getElementById("building").value;
+  toBe = buildings[building];
+  if (rareMaterial >= toBe.rareMaterialCost && material >= toBe.materialCost && money >= toBe.moneyCost && toBe.allowedTiles.includes(tiles[x][y].terrain) && tiles[x][y].building == -1) {
+    if (building == "factory2") {
+      notify("rare");
+    } else if (building == "nuclear") {
+      if (education >= 3) {
+        notify("nuclear");
+      } else {
+        notify("denial");
+        return;
+      }
+    }
+    tiles[x][y].building = toBe.id;
+    drawTile(x, y);
+    recalculate(toBe);
+    rewrite();
+  }
+}
+
+function recalculate(toBe) {
+  money -= toBe.moneyCost;
+  material -= toBe.materialCost;
+  rareMaterial -= toBe.rareMaterialCost;
+  education += toBe.education;
+  moneyRate += toBe.moneyRate;
+  pollutionRate += toBe.pollutionRate;
+  if (energy >= 5000) {
+    notify("win");
+  }
+  if (education > 0 && education < 4) {
+    notify("edu" + education);
+  }
+  var result = toBe.calc(tiles[x][y].terrain, adj(x, y)) + toBe.energyRate;
+  energy += result;
+  conn.send({energy: energy});
+  if (toBe.energyRate > 0) {
+    moneyRate += Math.floor(toBe.energyRate / 10);
+  }
+  if (moneyRate < 0) {
+    notify("red");
+  }
+  tiles[x][y].energy = result;
+  document.getElementById("tile").innerHTML = "Energy Production: " + result;
+  rewrite();
+}
+
+document.getElementById("build").addEventListener("click", build);
+
+function drawTile(x1, y1) {
+  terrain = tiles[x1][y1].terrain;
+  ctx.fillStyle = colors[terrain];
+  ctx.fillRect(x1 * size, y1 * size, size, size);
+  ctx.strokeStyle = "#777777";
+  ctx.strokeRect(x1 * size, y1 * size, size, size);
+  if (tiles[x1][y1].building != -1) {
+    image = document.getElementById(ids[tiles[x1][y1].building] + "-img");
+    ctx.drawImage(image, x1 * size, y1 * size);
+  }
+}
+
+canvas.addEventListener('click', function(event) {
+  x = Math.floor((event.pageX - elemLeft) / size);
+  y = Math.floor((event.pageY - elemTop) / size);
+  document.getElementById("coord").innerHTML = "(" + x + ", " + y + ")";
+  document.getElementById("tile").innerHTML = "Energy Production: " + tiles[x][y].energy;
+}, false);
+
+var tiles = []
+for (var i = 0; i < 10; i++) {
+  tiles[i] = [];
+  for (var j = 0; j < 10; j++) {
+    tiles[i][j] = {
+      "terrain": Math.floor(Math.random() * 4),
+      "building": -1,
+      "energy": 0
+    };
+    drawTile(i, j);
+  }
+}
+
+function tick() {
+  pollution += pollutionRate;
+  material += materialRate;
+  rareMaterial += rareMaterialRate;
+  money += moneyRate;
+  document.getElementById("clean").innerHTML = "Clean Pollution for $" + Math.floor(pollution * pollution * count);
+  if (pollution >= 500) {
+    notify("pollute3");
+  } else if (pollution >= 250) {
+    notify("pollute2");
+  } else if (pollution >= 100) {
+    notify("pollute1");
+  }
+  if (money < 0) {
+    notify("negative");
+  }
+  rewrite();
+}
+
+setInterval(tick, 3000);
+
+function clean() {
+  count++;
+  if (money >= Math.floor(pollution * pollution * count)) {
+    money -= Math.floor(pollution * pollution * count);
+    pollution = 0;
+    document.getElementById("clean").innerHTML = "Clean Pollution for $" + 0;
+    notify("clean");
+  }
+}
+
+document.getElementById("clean").addEventListener("click", clean);
+
+      </script>
+  </body>
 </html>
