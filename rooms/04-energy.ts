@@ -23,7 +23,7 @@ export class EnergyRoom extends Room {
     }
 
     onLeave (client) {
-        this.players[client.id] = {};
+        this.allowReconnection(client);
     }
 
     onMessage (client, data) {
