@@ -44,7 +44,8 @@ var arr = energy();
 gameServer.define("energy", arr[1]);
 app.use('/dash', arr[0]);
 
-app.use('/game', express.static(path.join(__dirname, "static/04-energy.html")));
+app.use('/', express.static(path.join(__dirname, "static")));
+app.use('/', serveIndex(path.join(__dirname, "static"), {'icons': true}))
 
 // (optional) attach web monitoring panel
 app.use('/colyseus', monitor());
