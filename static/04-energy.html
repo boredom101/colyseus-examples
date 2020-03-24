@@ -76,12 +76,11 @@ Welcome to your new job as city planner of Electro-opolis, please do not destroy
       var client = new Colyseus.Client(location.protocol.replace("http", "ws") + host + (location.port ? ':' + location.port : ''));
 
 var conn;
-var name = prompt("What is your name?");
 
 client.join("energy").then(room => {
   conn = room;
   conn.send({
-    name: name
+    name: "Yisroel"
   });
 });
 
