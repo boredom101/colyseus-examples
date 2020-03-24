@@ -20,7 +20,7 @@
     </style>
     <script type="text/javascript" src="colyseus.js"></script>
   </head>
-  <body>
+  <body onload="onload();">
     <div id="images">
   <img id="nuclear-img" width="40" height="40" src="nuclear.png">
   <img id="dam-img" width="40" height="40" src="dam.png">
@@ -77,15 +77,16 @@ Welcome to your new job as city planner of Electro-opolis, please do not destroy
 
 var conn;
 
-client.join("energy").then(room => {
-  conn = room;
-  conn.send({
-    name: "Yisroel"
-  });
-});
+function onload() {
+    client.join("energy").then(room => {
+      conn = room;
+      conn.send({
+        name: "Yisroel"
+      });
+    });
 
-while (!conn) {}
-
+    while (!conn) {}
+}
 var info = {
   "denial": '“Not in my backyard!” - Concerned Citizen',
   "pollute1": 'The city is getting polluted.',
