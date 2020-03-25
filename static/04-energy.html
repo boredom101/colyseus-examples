@@ -78,7 +78,7 @@ Welcome to your new job as city planner of Electro-opolis, please do not destroy
 var conn;
 
 function onload() {
-    client.join("energy").then(room => {
+    client.joinOrCreate("energy").then(room => {
       conn = room;
       conn.send({
         name: "Yisroel"
