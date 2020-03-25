@@ -7,7 +7,7 @@ interface IClient {
 
 export class EnergyRoom extends Room {
     maxClients = 3;
-    players?: { [id: string]: IClient; };
+    players?: { [id: string]: IClient; } = {};
 
     constructor(players) {
         super(...arguments);
