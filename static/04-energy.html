@@ -84,8 +84,6 @@ function onload() {
         name: "Yisroel"
       });
     });
-
-    while (!conn) {}
 }
 var info = {
   "denial": '“Not in my backyard!” - Concerned Citizen',
@@ -343,7 +341,9 @@ function recalculate(toBe) {
   }
   var result = toBe.calc(tiles[x][y].terrain, adj(x, y)) + toBe.energyRate;
   energy += result;
-  conn.send({energy: energy});
+  if (conn) {
+      conn.send({energy: energy});
+  }
   if (toBe.energyRate > 0) {
     moneyRate += Math.floor(toBe.energyRate / 10);
   }
