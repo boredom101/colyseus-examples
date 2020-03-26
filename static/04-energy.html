@@ -78,12 +78,18 @@ Welcome to your new job as city planner of Electro-opolis, please do not destroy
 var conn;
 
 function onload() {
+    var name = prompt("What is your name?");
     client.joinOrCreate("energy").then(room => {
       conn = room;
       conn.send({
-        name: "Yisroel"
+        name: name
       });
+      conn.onMessage((message) => {
+        console.log("message received from server");
+        console.log(message);
     });
+    });
+
 }
 var info = {
   "denial": '“Not in my backyard!” - Concerned Citizen',
@@ -390,6 +396,11 @@ for (var i = 0; i < 10; i++) {
 }
 
 function tick() {
+  if (conn) {
+      conn.send({
+          update: true
+      });
+  }
   pollution += pollutionRate;
   material += materialRate;
   rareMaterial += rareMaterialRate;
