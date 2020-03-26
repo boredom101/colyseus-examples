@@ -22,7 +22,13 @@ export class EnergyRoom extends Room {
     }
 
     onMessage (client, data) {
-        this.players[client.id] = data;
+        if (data.hasOwnProperty('update')) {
+            this.send(client, this.players)
+        } else if (data.hasOwnProperty('energy')) {
+            this.players[client.id]['energy'] = data['energy'];
+        } else {
+            this.players[client.id]['name'] = data['name'];
+        }
     }
 
     onDispose () {
