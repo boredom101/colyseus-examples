@@ -378,7 +378,7 @@ function drawTile(x1, y1) {
 canvas.addEventListener('click', function(event) {
     console.log(event.pageX - elemLeft);
     console.log(event.pageX);
-    console.log(event.elemLeft);
+    console.log(elemLeft);
   x = Math.floor((event.pageX - elemLeft) / size);
   y = Math.floor((event.pageY - elemTop) / size);
   document.getElementById("coord").innerHTML = "(" + x + ", " + y + ")";
