@@ -39,8 +39,6 @@ gameServer.define("state_handler", StateHandlerRoom);
 // Register StateHandlerRoom as "state_handler"
 gameServer.define("auth", AuthRoom);
 
-var arr = energy();
-
 gameServer.define("energy", EnergyRoom);
 
 app.use('/', express.static(path.join(__dirname, "static")));
