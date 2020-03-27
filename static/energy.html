@@ -95,7 +95,7 @@ var conn;
 function updateTable(message) {
     var table = document.getElementById('table');
     var data = "";
-    for (const [key, value] of Object.entries(object)) {
+    for (const [key, value] of Object.entries(message)) {
         data += `
             <tr>
     <th>${value['name']}</th>
