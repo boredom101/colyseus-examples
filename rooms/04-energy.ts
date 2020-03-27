@@ -28,6 +28,7 @@ export class EnergyRoom extends Room {
             this.players[client.id]['energy'] = data['energy'];
         } else {
             this.players[client.id]['name'] = data['name'];
+            this.players[client.id]['energy'] = 0;
         }
     }
 
