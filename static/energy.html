@@ -66,7 +66,7 @@ Welcome to your new job as city planner of Electro-opolis, please do not destroy
 
   <canvas id="canvas-demo" width="400" height="400"></canvas>
     
-    <table>
+    <table id="table">
   <tr>
     <th>Name</th>
     <th>Energy</th>
@@ -92,6 +92,19 @@ Welcome to your new job as city planner of Electro-opolis, please do not destroy
 
 var conn;
 
+function updateTable(message) {
+    document.getElementById('table');
+    var data = "";
+    for (const [key, value] of Object.entries(object)) {
+        data += `
+            <tr>
+    <th>${value['name']}</th>
+    <th>${value['energy']}</th>
+  </tr>\n
+        `;
+    }
+}
+
 function onload() {
     var name = prompt("What is your name?");
     client.joinOrCreate("energy").then(room => {
@@ -102,6 +115,7 @@ function onload() {
       conn.onMessage((message) => {
         console.log("message received from server");
         console.log(message);
+        updateTable(message);
     });
     });
 
