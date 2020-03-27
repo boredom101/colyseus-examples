@@ -93,7 +93,7 @@ Welcome to your new job as city planner of Electro-opolis, please do not destroy
 var conn;
 
 function updateTable(message) {
-    document.getElementById('table');
+    var table = document.getElementById('table');
     var data = "";
     for (const [key, value] of Object.entries(object)) {
         data += `
@@ -103,6 +103,7 @@ function updateTable(message) {
   </tr>\n
         `;
     }
+    table.innerHTML = data;
 }
 
 function onload() {
