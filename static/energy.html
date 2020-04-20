@@ -41,7 +41,7 @@
 <button id="build">Build</button>
 <button id="clean">Clean Pollution For $0</button>
 <span id="coord">(0, 0)</span>
-<span id="tile">Energy Production: 0</span>
+<span id="tile">Tile Energy Production: 0</span>
 
 <div id="columns">
   <div id="resources" class="stats">
@@ -393,7 +393,7 @@ function recalculate(toBe) {
     notify("red");
   }
   tiles[x][y].energy = result;
-  document.getElementById("tile").innerHTML = "Energy Production: " + result;
+  document.getElementById("tile").innerHTML = "Tile Energy Production: " + result;
   rewrite();
 }
 
@@ -418,9 +418,9 @@ canvas.addEventListener('click', function(event) {
   x = Math.floor((event.pageX - elemLeft) / size);
   y = Math.floor((event.pageY - elemTop) / size);
   document.getElementById("coord").innerHTML = "(" + x + ", " + y + ")";
-  document.getElementById("tile").innerHTML = "Energy Production: " + tiles[x][y].energy;
+  document.getElementById("tile").innerHTML = "Tile Energy Production: " + tiles[x][y].energy;
 }, false);
-
+T
 var tiles = []
 for (var i = 0; i < 10; i++) {
   tiles[i] = [];
