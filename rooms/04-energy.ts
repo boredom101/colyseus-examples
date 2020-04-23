@@ -28,8 +28,8 @@ export class EnergyRoom extends Room {
             this.players[client.id]['energy'] = data['energy'];
             if (data['energy'] >= 5000) {
                 this.broadcast({
-                    "message":  + ""
-                });
+                    "message": this.players[client.id]['name'] + " has won!"
+                }, { except: client });
             }
         } else {
             this.players[client.id]['name'] = data['name'];
