@@ -26,6 +26,11 @@ export class EnergyRoom extends Room {
             this.send(client, this.players)
         } else if (data.hasOwnProperty('energy')) {
             this.players[client.id]['energy'] = data['energy'];
+            if (data['energy'] >= 5000) {
+                this.broadcast({
+                    "message":  + ""
+                });
+            }
         } else {
             this.players[client.id]['name'] = data['name'];
             this.players[client.id]['energy'] = 0;
