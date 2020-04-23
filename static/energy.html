@@ -120,9 +120,11 @@ function onload() {
         name: name
       });
       conn.onMessage((message) => {
-        console.log("message received from server");
-        console.log(message);
-        updateTable(message);
+        if (message.hasOwnProperty('message')) {
+            alert(message['message']);
+        } else {
+            updateTable(message);
+        }
     });
     });
 
